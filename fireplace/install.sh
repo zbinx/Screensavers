@@ -6,21 +6,23 @@ if [[ ! -e $dir ]]; then
 	WINEARCH=win32 WINEPREFIX=/home/pi/.screensavers winecfg	
 fi
 
+#Stop existing screensaver.service
+file=/etc/systemd/system/screensaver.service
+if [[ -f $file ]]; then
+	sudo systemctl stop screensaver	
+	sudo systemctl disable screensaver	
+fi
+
 #Install screensaver
-cp fireplace.scr /home/pi/.screensavers/drive_c/windows/
-cp fireplace.sh /home/pi/.screensavers/
-sudo cp screensaver.service /etc/systemd/system
+cp /home/pi/Screensavers/fireplace/fireplace.scr /home/pi/.screensavers/drive_c/windows/
+cp /home/pi/Screensavers/fireplace/screensaver.sh /home/pi/.screensavers/
+chmod +x /home/pi/.screensavers/screensaver.sh
+sudo cp /home/pi/Screensavers/fireplace/screensaver.service /etc/systemd/system
 sudo systemctl daemon-reload
-sudo systemctl start fireplace
-sudo systemctl enable fireplace
+sudo systemctl start screensaver
+sudo systemctl enable screensaver
 
 #Display screensaver after install
-WINEPREFIX=~/.screensavers wine '/home/pi/.screensavers/drive_c/windows/fireplace.scr' /s
+WINEPREFIX=/home/pi/.screensavers wine /home/pi/.screensavers/drive_c/windows/fireplace.scr /s
 
-#Clear screen and print instructions
-clear
-echo "Reload service daemon: sudo systemctl daemon-reload"
-echo "Verify service is running: sudo systemctl status screensaver"
-echo "Enable on startup: sudo systemctl enable screensaver"
-echo "Start 3dpipes service: sudo systemctl start screensaver"
-echo "Stop 3dpipes service: sudo systemctl stop screensaver"
+notify-send -i /home/pi/Screensavers/fireplace/screenshot.png --urgency=low --app-name="" Screensaver Installed

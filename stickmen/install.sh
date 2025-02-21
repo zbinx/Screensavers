@@ -6,22 +6,24 @@ if [[ ! -e $dir ]]; then
 	WINEARCH=win32 WINEPREFIX=/home/pi/.screensavers winecfg	
 fi
 
+#Stop existing screensaver.service
+file=/etc/systemd/system/screensaver.service
+if [[ -f $file ]]; then
+	sudo systemctl stop screensaver	
+	sudo systemctl disable screensaver	
+fi
+
 #Install screensaver
-cp StickMen.scr /home/pi/.screensavers/drive_c/windows/system32
-cp StickMenSound.exe /home/pi/.screensavers/drive_c/windows/system32
-cp stickmen.sh /home/pi/.screensavers/
-sudo cp screensaver.service /etc/systemd/system
+cp /home/pi/Screensavers/stickmen/StickMen.scr /home/pi/.screensavers/drive_c/windows/system32
+cp /home/pi/Screensavers/stickmen/StickMenSound.exe /home/pi/.screensavers/drive_c/windows/system32
+cp /home/pi/Screensavers/stickmen/screensaver.sh /home/pi/.screensavers/
+chmod +x /home/pi/.screensavers/screensaver.sh
+sudo cp /home/pi/Screensavers/stickmen/screensaver.service /etc/systemd/system
 sudo systemctl daemon-reload
-sudo systemctl start stickmen
-sudo systemctl enable stickmen
+sudo systemctl start screensaver
+sudo systemctl enable screensaver
 
 #Display screensaver after install
-WINEPREFIX=~/.screensavers wine '/home/pi/.screensavers/drive_c/windows/system32/StickMen.scr' /s
+WINEPREFIX=/home/pi/.screensavers wine /home/pi/.screensavers/drive_c/windows/system32/StickMen.scr /s
 
-#Clear screen and print instructions
-clear
-echo "Reload service daemon: sudo systemctl daemon-reload"
-echo "Verify service is running: sudo systemctl status screensaver"
-echo "Enable on startup: sudo systemctl enable screensaver"
-echo "Start stickmen service: sudo systemctl start screensaver"
-echo "Stop stickmen service: sudo systemctl stop screensaver"
+notify-send -i /home/pi/Screensavers/stickmen/screenshot.png --urgency=low --app-name="" Screensaver Installed
